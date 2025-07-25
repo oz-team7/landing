@@ -1,0 +1,147 @@
+/* ─── Reset & Base ───────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fff;
+  color: #333;
+  line-height: 1.6;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+ul {
+  list-style: none;
+}
+
+/* ─── Container ─────────────────────────────────── */
+.container {
+  width: 90%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* ─── Header / Nav ───────────────────────────────── */
+header {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 100;
+}
+.nav-container {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  gap: 25px;
+}
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+.logo-container img {
+  width: 40px;
+  height: auto;
+  margin-right: 10px;
+}
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #FF7A00;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  margin-left: auto;
+}
+.nav-links a {
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+.nav-links a:hover {
+  color: #FF7A00;
+  background-color: #f0f0f0;
+}
+.login-button {
+  background: #FF7A00;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.login-button:hover {
+  background: #e66a00;
+}
+
+/* ─── Hero ───────────────────────────────────────── */
+.hero {
+  background: #fff;
+}
+.hero .container {
+  text-align: center;
+  padding: 100px 0;
+}
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  color: #555;
+}
+.search-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.search-container input {
+  flex: 1;
+  padding: 15px 20px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+.search-container button {
+  background: #FF7A00;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 15px 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.search-container button:hover {
+  background: #e66a00;
+}
+
+
+/* AI Intro Page Specific Styles */
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.bg-card\/30 {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+...
