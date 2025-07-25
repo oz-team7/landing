@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROMPOT 관리자 대시보드</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #343a40;
+            color: white;
+            padding-top: 20px;
+            flex-shrink: 0;
+        }
+        .sidebar .nav-link {
+            color: white;
+            padding: 12px 25px; /* Increased padding for better touch targets and visual space */
+            font-size: 1.05rem; /* Slightly larger font for readability */
+            transition: background-color 0.2s ease; /* Smooth transition on hover/active */
+        }
+        .sidebar .nav-link:hover {
+            background-color: #495057; /* Darker hover state */
+        }
+        .sidebar .nav-link.active {
+            background-color: #0d6efd;
+            font-weight: 600; /* Make active link bolder */
+        }
+        .content {
+            flex-grow: 1;
+            padding: 30px; /* Increased overall content padding */
+        }
+        h1 {
+            font-size: 2.5rem; /* Larger main heading */
+            font-weight: 700;
+            color: #343a40;
+            margin-bottom: 30px;
+        }
+        h2 {
+            font-size: 1.8rem; /* Adjusted section headings */
+            font-weight: 600;
+            color: #495057;
+        }
+        h3 {
+            font-size: 1.5rem; /* Sub-headings */
+            font-weight: 600;
+            color: #495057;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        h4 {
+            font-size: 1.25rem; /* Smaller headings */
+            font-weight: 600;
+            color: #495057;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .card {
+            margin-bottom: 25px; /* Slightly more space between cards */
+            border-radius: 0.5rem; /* Rounded corners for cards */
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Subtle shadow */
+        }
+        .card-header {
+            background-color: #e9ecef; /* Lighter header background */
+            border-bottom: 1px solid #dee2e6;
+            padding: 1rem 1.5rem;
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .table thead th {
+            background-color: #f1f3f5;
+            color: #495057;
+            font-weight: 600;
+            vertical-align: middle;
+            padding: 0.75rem 1rem;
+            text-align: center; /* All headers center-aligned */
+        }
+        .table tbody td {
+            vertical-align: middle;
+            padding: 0.75rem 1rem;
+            text-align: left; /* Default to left for all td */
+        }
+
+        /* Specific alignment rules for each table */
+
+        /* 회원 관리 */
+        #userManagement .table tbody td:first-child, /* ID */
+        #userManagement .table tbody td:nth-child(2), /* 이름 */
+        #userManagement .table tbody td:nth-child(3), /* 이메일 */
+        #userManagement .table tbody td:nth-child(4), /* 전화번호 */
+        #userManagement .table tbody td:nth-child(5) /* 마케팅 정보 수집 동의 여부 */
+        {
+            text-align: center;
+        }
+
+        /* 게시물 관리 */
+        #postManagement .table tbody td:first-child, /* 작성자 */
+        #postManagement .table tbody td:nth-child(4), /* 가격 */
+        #postManagement .table tbody td:nth-child(5), /* 승인 요청 일시 */
+        #postManagement .table tbody td:last-child /* 액션 */
+        {
+            text-align: center;
+        }
+        #postManagement .table tbody td:nth-child(2), /* 제목 */
+        #postManagement .table tbody td:nth-child(3) /* 내용 미리보기 */
+        {
+            text-align: left;
+        }
+
+        /* 태그·카테고리 관리 */
+        #tagCategoryManagement .table tbody td:first-child, /* ID */
+        #tagCategoryManagement .table tbody td:nth-child(4), /* 생성일 */
+        #tagCategoryManagement .table tbody td:nth-child(5), /* 사용 빈도 */
+        #tagCategoryManagement .table tbody td:last-child /* 액션 */
+        {
+            text-align: center;
+        }
+        #tagCategoryManagement .table tbody td:nth-child(2), /* 이름 */
+        #tagCategoryManagement .table tbody td:nth-child(3) /* 유형 */
+        {
+            text-align: center;
+        }
+
+        /* 결제·정산 관리 */
+        /* 결제 내역 */
+        #paymentSettlementManagement #paymentTableBody td:first-child, /* ID */
+        #paymentSettlementManagement #paymentTableBody td:nth-child(4), /* 금액 */
+        #paymentSettlementManagement #paymentTableBody td:nth-child(5), /* 결제 상태 */
+        #paymentSettlementManagement #paymentTableBody td:nth-child(6), /* 결제 일시 */
+        #paymentSettlementManagement #paymentTableBody td:last-child /* 액션 */
+        {
+            text-align: center;
+        }
+        #paymentSettlementManagement #paymentTableBody td:nth-child(2), /* 구매자 */
+        #paymentSettlementManagement #paymentTableBody td:nth-child(3) /* 프롬프트 제목 */
+        {
+            text-align: center;
+        }
+        /* 판매자 정산 요청 */
+        #paymentSettlementManagement #settlementTableBody td:first-child, /* ID */
+        #paymentSettlementManagement #settlementTableBody td:nth-child(3), /* 요청 금액 */
+        #paymentSettlementManagement #settlementTableBody td:nth-child(4), /* 요청 일시 */
+        #paymentSettlementManagement #settlementTableBody td:nth-child(5), /* 상태 */
+        #paymentSettlementManagement #settlementTableBody td:last-child /* 액션 */
+        {
+            text-align: center;
+        }
+        #paymentSettlementManagement #settlementTableBody td:nth-child(2) /* 판매자 */
+        {
+            text-align: center;
+        }
+
+        /* 리뷰·댓글 모더레이션 */
+        #reviewCommentModeration .table tbody td:first-child, /* ID */
+        #reviewCommentModeration .table tbody td:nth-child(4), /* 별점 */
+        #reviewCommentModeration .table tbody td:nth-child(6), /* 작성 일시 */
+        #reviewCommentModeration .table tbody td:last-child /* 액션 */
+        {
+            text-align: center;
+        }
+        #reviewCommentModeration .table tbody td:nth-child(2), /* 작성자 */
+        #reviewCommentModeration .table tbody td:nth-child(3), /* 프롬프트 제목 */
+        #reviewCommentModeration .table tbody td:nth-child(5) /* 댓글 내용 */
+        {
+            text-align: center;
+        }
+
+        /* 통계·분석 대시보드 - 인기 프롬프트 상위 N개 */
+        #statisticsAnalysisDashboard .table tbody td:first-child, /* 순위 */
+        #statisticsAnalysisDashboard .table tbody td:nth-child(3), /* 판매량 */
+        #statisticsAnalysisDashboard .table tbody td:nth-child(4) /* 총 매출 */
+        {
+            text-align: center;
+        }
+        #statisticsAnalysisDashboard .table tbody td:nth-child(2) /* 프롬프트 제목 */
+        {
+            text-align: left;
+        }
+
+        /* 역할·권한 관리 */
+        #rolePermissionManagement .table tbody td:first-child, /* ID */
+        #rolePermissionManagement .table tbody td:nth-child(4), /* 역할 */
+        #rolePermissionManagement .table tbody td:nth-child(5), /* 상태 */
+        #rolePermissionManagement .table tbody td:last-child /* 액션 */
+        {
+            text-align: center;
+        }
+        #rolePermissionManagement .table tbody td:nth-child(2), /* 이름 */
+        #rolePermissionManagement .table tbody td:nth-child(3) /* 이메일 */
+        {
+            text-align: center;
+        }
+
+        /* 로그·알림 - 액션 로그 */
+        #logsNotifications #actionLogTableBody td:first-child, /* ID */
+        #logsNotifications #actionLogTableBody td:nth-child(5) /* 일시 */
+        {
+            text-align: center;
+        }
+        #logsNotifications #actionLogTableBody td:nth-child(2), /* 이벤트 유형 */
+        #logsNotifications #actionLogTableBody td:nth-child(3), /* 사용자 */
+        #logsNotifications #actionLogTableBody td:nth-child(4) /* 대상 */
+        {
+            text-align: center;
+        }
+        /* 로그·알림 - 발송 이력 */
+        #logsNotifications #announcementHistoryTableBody td:first-child, /* ID */
+        #logsNotifications #announcementHistoryTableBody td:last-child /* 발송 일시 */
+        {
+            text-align: center;
+        }
+        #logsNotifications #announcementHistoryTableBody td:nth-child(2) /* 제목 */
+        {
+            text-align: left;
+        }
+
+
+        /* 고객지원 티켓 시스템 */
+        #customerSupportTicketSystem .table tbody td:first-child, /* 티켓 ID */
+        #customerSupportTicketSystem .table tbody td:nth-child(3), /* 문의 유형 */
+        #customerSupportTicketSystem .table tbody td:nth-child(4), /* 상태 */
+        #customerSupportTicketSystem .table tbody td:nth-child(5), /* 생성 일시 */
+        #customerSupportTicketSystem .table tbody td:last-child /* 액션 */
+        {
+            text-align: center;
+        }
+        #customerSupportTicketSystem .table tbody td:nth-child(2) /* 작성자 */
+        {
+            text-align: center;
+        }
+        .pagination .page-link {
+            border-radius: 0.25rem;
+            margin: 0 3px;
+        }
+        .form-control, .form-select {
+            border-radius: 0.25rem;
+        }
+        .btn {
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+        .btn-sm {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        .input-group-text {
+            border-radius: 0.25rem;
+        }
+        pre {
+            background-color: #e9ecef;
+            border-radius: 0.25rem;
+            padding: 1rem;
+            white-space: pre-wrap; /* Ensure long lines wrap */
+            word-break: break-all; /* Break long words */
+        }
+        /* Chart styling */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            padding: 15px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        /* Adjust sidebar title */
+        .sidebar h4 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .sidebar hr {
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .sidebar .nav-item {
+            margin-bottom: 5px;
+        }
+        .nav-tabs .nav-link {
+            font-weight: 600;
+            color: #6c757d;
+        }
+        .nav-tabs .nav-link.active {
+            color: #0d6efd;
+            background-color: #fff;
+            border-color: #dee2e6 #dee2e6 #fff;
+        }
+        .tab-content {
+            border: 1px solid #dee2e6;
+            border-top: none;
+            padding: 20px;
+            background-color: #fff;
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+        }
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        textarea.form-control {
+            min-height: 100px;
+        }
+        .input-group .form-control {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .input-group .input-group-text {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .table tbody td button {
+            margin: 0 2px;
+        }
+        .table tbody td .form-select, .table tbody td .form-check-input {
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .table tbody td .form-check-label {
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        .table tbody td .form-check {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        .table tbody td .role-select {
+            width: auto;
+            min-width: 120px;
+        }
+        .table tbody td .ticket-status-select {
+            width: auto;
+            min-width: 100px;
+        }
+        /* Chart styling */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="p-3">
+                <h4 class="text-white text-center">PROMPOT Admin</h4>
+                <hr class="text-white">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#userManagement">회원 관리</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#postManagement">게시물 관리</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tagCategoryManagement">태그·카테고리 관리</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#paymentSettlementManagement">결제·정산 관리</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reviewCommentModeration">리뷰·댓글 모더레이션</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#statisticsAnalysisDashboard">통계·분석 대시보드</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#rolePermissionManagement">역할·권한 관리</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#systemSettings">시스템 설정</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#logsNotifications">로그·알림</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#customerSupportTicketSystem">고객지원 티켓 시스템</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content" class="content">
+            <h1 class="mb-4">관리자 대시보드</h1>
+
+            <!-- 회원 관리 섹션 -->
+            <section id="userManagement" class="card">
+                <div class="card-header">
+                    <h2>회원 관리</h2>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="userSearchInput" placeholder="이름 또는 이메일 검색">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>이름</th>
+                                    <th>이메일</th>
+                                    <th>전화번호</th>
+                                    <th>마케팅 정보 수집 동의 여부</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody">
+                                <!-- User data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav>
+                        <ul class="pagination justify-content-center" id="userPagination">
+                            <!-- Pagination will be inserted here by JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+            </section>
+
+            <!-- 게시물 관리 섹션 -->
+            <section id="postManagement" class="card">
+                <div class="card-header">
+                    <h2>게시물 관리</h2>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="postSearchInput" placeholder="제목 또는 작성자 검색">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>작성자</th>
+                                    <th>제목</th>
+                                    <th>내용 미리보기</th>
+                                    <th>가격</th>
+                                    <th>승인 요청 일시</th>
+                                    <th>액션</th>
+                                </tr>
+                            </thead>
+                            <tbody id="postTableBody">
+                                <!-- Post data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav>
+                        <ul class="pagination justify-content-center" id="postPagination">
+                            <!-- Pagination will be inserted here by JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+            </section>
+
+            <!-- 태그·카테고리 관리 섹션 -->
+            <section id="tagCategoryManagement" class="card">
+                <div class="card-header">
+                    <h2>태그·카테고리 관리</h2>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="tagCategorySearchInput" placeholder="태그/카테고리 검색">
+                    </div>
+                    <button class="btn btn-primary mb-3" id="addTagCategoryBtn">새 태그/카테고리 추가</button>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>이름</th>
+                                    <th>유형</th>
+                                    <th>생성일</th>
+                                    <th>사용 빈도</th>
+                                    <th>액션</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tagCategoryTableBody">
+                                <!-- Tag/Category data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav>
+                        <ul class="pagination justify-content-center" id="tagCategoryPagination">
+                            <!-- Pagination will be inserted here by JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+            </section>
+
+            <!-- 결제·정산 관리 섹션 -->
+            <section id="paymentSettlementManagement" class="card">
+                <div class="card-header">
+                    <h2>결제·정산 관리</h2>
+                </div>
+                <div class="card-body">
+                    <h3>결제 내역</h3>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>구매자</th>
+                                    <th>프롬프트 제목</th>
+                                    <th>금액</th>
+                                    <th>결제 상태</th>
+                                    <th>결제 일시</th>
+                                    <th>액션</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentTableBody">
+                                <!-- Payment data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav>
+                        <ul class="pagination justify-content-center" id="paymentPagination">
+                            <!-- Pagination will be inserted here by JavaScript -->
+                        </ul>
+                    </nav>
+
+                    <h3>판매자 정산 요청</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>판매자</th>
+                                    <th>요청 금액</th>
+                                    <th>요청 일시</th>
+                                    <th>상태</th>
+                                    <th>액션</th>
+                                </tr>
+                            </thead>
+                            <tbody id="settlementTableBody">
+                                <!-- Settlement data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav>
+                        <ul class="pagination justify-content-center" id="settlementPagination">
+                            <!-- Pagination will be inserted here by JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+            </section>
+
+            <!-- 리뷰·댓글 모더레이션 섹션 -->
+            <section id="reviewCommentModeration" class="card">
+                <div class="card-header">
+                    <h2>리뷰·댓글 모더레이션</h2>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="reviewCommentSearchInput" placeholder="작성자 또는 내용 검색">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>작성자</th>
+                                    <th>프롬프트 제목</th>
+                                    <th>별점</th>
+                                    <th>댓글 내용</th>
+                                    <th>작성 일시</th>
+                                    <th>액션</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reviewCommentTableBody">
+                                <!-- Review/Comment data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav>
+                        <ul class="pagination justify-content-center" id="reviewCommentPagination">
+                            <!-- Pagination will be inserted here by JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+            </section>
+
+            <!-- 통계·분석 대시보드 섹션 -->
+            <section id="statisticsAnalysisDashboard" class="card">
+                <div class="card-header">
+                    <h2>통계·분석 대시보드</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>DAU/MAU 차트</h4>
+                            <div class="chart-container"><canvas id="dauMauChart"></canvas></div>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>일·주·월별 매출 그래프</h4>
+                            <div class="chart-container"><canvas id="salesChart"></canvas></div>
+                        </div>
+                    </div>
+                    <h4 class="mt-4">인기 프롬프트 상위 N개</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>순위</th>
+                                    <th>프롬프트 제목</th>
+                                    <th>판매량</th>
+                                    <th>총 매출</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topPromptsTableBody">
+                                <!-- Top Prompts data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 역할·권한 관리 섹션 -->
+            <section id="rolePermissionManagement" class="card">
+                <div class="card-header">
+                    <h2>역할·권한 관리</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>이름</th>
+                                    <th>이메일</th>
+                                    <th>역할</th>
+                                    <th>상태</th>
+                                    <th>액션</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminAccountTableBody">
+                                <!-- Admin Account data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav>
+                        <ul class="pagination justify-content-center" id="adminAccountPagination">
+                            <!-- Pagination will be inserted here by JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+            </section>
+
+            <!-- 시스템 설정 섹션 -->
+            <section id="systemSettings" class="card">
+                <div class="card-header">
+                    <h2>시스템 설정</h2>
+                </div>
+                <div class="card-body">
+                    <h4 class="mt-4">이용약관·개인정보처리방침</h4>
+                    <div class="mb-3">
+                        <label for="termsOfServiceEditor" class="form-label">이용약관</label>
+                        <textarea class="form-control" id="termsOfServiceEditor" rows="10">이용약관 내용...</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="privacyPolicyEditor" class="form-label">개인정보처리방침</label>
+                        <textarea class="form-control" id="privacyPolicyEditor" rows="10">개인정보처리방침 내용...</textarea>
+                    </div>
+                    <button class="btn btn-primary mb-4" id="saveLegalTextsBtn">저장</button>
+
+                    <h4 class="mt-4">이메일 템플릿</h4>
+                    <div class="mb-3">
+                        <label for="emailTemplateSubject" class="form-label">제목</label>
+                        <input type="text" class="form-control" id="emailTemplateSubject" value="[PROMPOT] 새로운 알림">
+                    </div>
+                    <div class="mb-3">
+                        <label for="emailTemplateBody" class="form-label">본문</label>
+                        <textarea class="form-control" id="emailTemplateBody" rows="5">안녕하세요, {이름}님. PROMPOT에서 새로운 소식을 알려드립니다.</textarea>
+                    </div>
+                    <button class="btn btn-primary mb-4" id="saveEmailTemplateBtn">저장</button>
+
+                    <h4 class="mt-4">플랫폼 수수료율 설정</h4>
+                    <div class="input-group mb-3">
+                        <input type="number" class="form-control" id="commissionRate" value="10" min="0" max="100">
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <button class="btn btn-primary" id="saveCommissionRateBtn">저장</button>
+                </div>
+            </section>
+
+            <!-- 로그·알림 섹션 -->
+            <section id="logsNotifications" class="card">
+                <div class="card-header">
+                    <h2>로그·알림</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="logTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="action-log-tab" data-bs-toggle="tab" data-bs-target="#actionLog" type="button" role="tab" aria-controls="actionLog" aria-selected="true">액션 로그</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="system-log-tab" data-bs-toggle="tab" data-bs-target="#systemLog" type="button" role="tab" aria-controls="systemLog" aria-selected="false">시스템 로그</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="logTabContent">
+                        <div class="tab-pane fade show active" id="actionLog" role="tabpanel" aria-labelledby="action-log-tab">
+                            <div class="table-responsive mt-3">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>이벤트 유형</th>
+                                            <th>사용자</th>
+                                            <th>대상</th>
+                                            <th>일시</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="actionLogTableBody">
+                                        <!-- Action Log data will be inserted here by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <nav>
+                                <ul class="pagination justify-content-center" id="actionLogPagination">
+                                    <!-- Pagination will be inserted here by JavaScript -->
+                                </ul>
+                            </nav>
+                        </div>
+                        <div class="tab-pane fade" id="systemLog" role="tabpanel" aria-labelledby="system-log-tab">
+                            <div class="mt-3">
+                                <h4>웹훅 로그</h4>
+                                <pre class="bg-light p-3 rounded">[2023-07-25 10:00:00] Webhook received from Payment Gateway: { "status": "success", "transactionId": "TXN123" }
+[2023-07-25 10:05:00] Webhook received from SMS Service: { "status": "sent", "messageId": "MSG456" }</pre>
+                                <h4>에러 로그</h4>
+                                <pre class="bg-light p-3 rounded">[2023-07-25 10:10:00] ERROR: Database connection failed. (Code: DB-001)
+[2023-07-25 10:15:00] ERROR: API rate limit exceeded for external service. (Service: X, Limit: 100/min)</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 class="mt-4">전체 공지사항</h4>
+                    <div class="mb-3">
+                        <label for="announcementTitle" class="form-label">제목</label>
+                        <input type="text" class="form-control" id="announcementTitle">
+                    </div>
+                    <div class="mb-3">
+                        <label for="announcementBody" class="form-label">내용</label>
+                        <textarea class="form-control" id="announcementBody" rows="5"></textarea>
+                    </div>
+                    <button class="btn btn-primary mb-3" id="sendAnnouncementBtn">공지사항 발송</button>
+
+                    <h5 class="mt-4">발송 이력</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>제목</th>
+                                    <th>발송 일시</th>
+                                </tr>
+                            </thead>
+                            <tbody id="announcementHistoryTableBody">
+                                <!-- Announcement History data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav>
+                        <ul class="pagination justify-content-center" id="announcementHistoryPagination">
+                            <!-- Pagination will be inserted here by JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+            </section>
+
+            <!-- 고객지원 티켓 시스템 섹션 -->
+            <section id="customerSupportTicketSystem" class="card">
+                <div class="card-header">
+                    <h2>고객지원 티켓 시스템</h2>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="ticketSearchInput" placeholder="티켓 ID, 작성자 또는 내용 검색">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>티켓 ID</th>
+                                    <th>작성자</th>
+                                    <th>문의 유형</th>
+                                    <th>상태</th>
+                                    <th>생성 일시</th>
+                                    <th>액션</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ticketTableBody">
+                                <!-- Ticket data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav>
+                        <ul class="pagination justify-content-center" id="ticketPagination">
+                            <!-- Pagination will be inserted here by JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Dummy Data
+        // ======================================================================================================
+        // 각 카테고리별 더미 데이터를 여기서 수정하거나 실제 API 연동을 위한 로직으로 대체할 수 있습니다.
+        // ======================================================================================================
+
+        // 회원 관리 데이터 (dummyUsers)
+        // 이 배열을 수정하여 회원 목록을 관리할 수 있습니다.
+        const dummyUsers = [
+            { id: 1, name: "김철수", email: "chulsoo.kim@example.com", phone: "010-1234-5678", marketingConsent: "예" },
+            { id: 2, name: "이영희", email: "younghee.lee@example.com", phone: "010-9876-5432", marketingConsent: "아니오" },
+            { id: 3, name: "박지성", email: "jisung.park@example.com", phone: "010-1111-2222", marketingConsent: "예" },
+            { id: 4, name: "최유리", email: "yuri.choi@example.com", phone: "010-3333-4444", marketingConsent: "아니오" },
+            { id: 5, name: "정민준", email: "minjun.jung@example.com", phone: "010-5555-6666", marketingConsent: "예" },
+            { id: 6, name: "한서연", email: "seoyeon.han@example.com", phone: "010-7777-8888", marketingConsent: "아니오" },
+            { id: 7, name: "강도윤", email: "doyoon.kang@example.com", phone: "010-9999-0000", marketingConsent: "예" },
+            { id: 8, name: "윤지우", email: "jiwoo.yoon@example.com", phone: "010-2222-1111", marketingConsent: "아니오" },
+            { id: 9, name: "신하은", email: "haeun.shin@example.com", phone: "010-4444-3333", marketingConsent: "예" },
+            { id: 10, name: "임준서", email: "junseo.lim@example.com", phone: "010-6666-5555", marketingConsent: "아니오" },
+            { id: 11, name: "오채원", email: "chaewon.oh@example.com", phone: "010-8888-7777", marketingConsent: "예" },
+            { id: 12, name: "황시우", email: "siwoo.hwang@example.com", phone: "010-0000-9999", marketingConsent: "아니오" },
+        ];
+
+        // 게시물 관리 데이터 (dummyPosts)
+        // 이 배열을 수정하여 게시물 목록을 관리할 수 있습니다.
+        const dummyPosts = [
+            { id: 1, author: "김철수", title: "새로운 AI 프롬프트 아이디어", content: "최근 연구 동향을 반영한 AI 프롬프트...", price: "10,000팟", requestDate: "2023-07-20 10:00" },
+            { id: 2, author: "이영희", title: "마케팅 전략을 위한 프롬프트", content: "소셜 미디어 캠페인 기획에 유용한...", price: "15,000팟", requestDate: "2023-07-21 11:30" },
+            { id: 3, author: "박지성", title: "개발자를 위한 코드 생성 프롬프트", content: "파이썬 함수 자동 생성 예시...", price: "20,000팟", requestDate: "2023-07-21 14:00" },
+            { id: 4, author: "최유리", title: "교육 콘텐츠 제작 프롬프트", content: "초등학생을 위한 과학 교육 자료...", price: "8,000팟", requestDate: "2023-07-22 09:00" },
+            { id: 5, author: "정민준", title: "금융 분석 보고서 작성 프롬프트", content: "주식 시장 동향 분석 및 예측...", price: "25,000팟", requestDate: "2023-07-22 16:00" },
+            { id: 6, author: "한서연", title: "여행 계획 추천 프롬프트", content: "유럽 배낭여행 일정 추천 및 예산...", price: "12,000팟", requestDate: "2023-07-23 09:30" },
+            { id: 7, author: "강도윤", title: "건강 관리 식단 프롬프트", content: "개인 맞춤형 다이어트 식단 제안...", price: "18,000팟", requestDate: "2023-07-23 13:00" },
+            { id: 8, author: "윤지우", title: "게임 시나리오 아이디어 프롬프트", content: "판타지 RPG 게임의 새로운 스토리...", price: "30,000팟", requestDate: "2023-07-23 17:00" },
+            { id: 9, author: "신하은", title: "부동산 투자 분석 프롬프트", content: "지역별 부동산 시장 동향 및 투자...", price: "22,000팟", requestDate: "2023-07-24 10:00" },
+            { id: 10, author: "임준서", title: "법률 문서 초안 작성 프롬프트", content: "계약서 초안 작성 및 검토 가이드...", price: "35,000팟", requestDate: "2023-07-24 14:00" },
+            { id: 11, author: "오채원", title: "자기소개서 작성 프롬프트", content: "면접관에게 깊은 인상을 남기는...", price: "9,000팟", requestDate: "2023-07-24 18:00" },
+            { id: 12, author: "황시우", title: "과학 논문 요약 프롬프트", content: "최신 과학 논문의 핵심 내용을...", price: "17,000팟", requestDate: "2023-07-25 09:00" },
+        ];
+
+        // 태그·카테고리 관리 데이터 (dummyTagsCategories)
+        // 이 배열을 수정하여 태그 및 카테고리 목록을 관리할 수 있습니다.
+        const dummyTagsCategories = [
+            { id: 1, name: "AI", type: "태그", createdAt: "2023-01-01", usageCount: 120 },
+            { id: 2, name: "마케팅", type: "카테고리", createdAt: "2023-01-05", usageCount: 80 },
+            { id: 3, name: "개발", type: "태그", createdAt: "2023-01-10", usageCount: 150 },
+            { id: 4, name: "교육", type: "카테고리", createdAt: "2023-01-15", usageCount: 60 },
+            { id: 5, name: "금융", type: "태그", createdAt: "2023-01-20", usageCount: 90 },
+            { id: 6, name: "여행", type: "카테고리", createdAt: "2023-01-25", usageCount: 40 },
+        ];
+
+        // 결제 내역 데이터 (dummyPayments)
+        // 이 배열을 수정하여 결제 내역 목록을 관리할 수 있습니다.
+        const dummyPayments = [
+            { id: 1, buyer: "김철수", promptTitle: "새로운 AI 프롬프트 아이디어", amount: "10,000원", status: "성공", date: "2023-07-20 10:05" },
+            { id: 2, buyer: "이영희", promptTitle: "마케팅 전략을 위한 프롬프트", amount: "15,000원", status: "성공", date: "2023-07-21 11:35" },
+            { id: 3, buyer: "박지성", promptTitle: "개발자를 위한 코드 생성 프롬프트", amount: "20,000원", status: "환불", date: "2023-07-21 14:05" },
+            { id: 4, buyer: "최유리", promptTitle: "교육 콘텐츠 제작 프롬프트", amount: "8,000원", status: "성공", date: "2023-07-22 09:05" },
+            { id: 5, buyer: "정민준", promptTitle: "금융 분석 보고서 작성 프롬프트", amount: "25,000원", status: "실패", date: "2023-07-22 16:05" },
+        ];
+
+        // 판매자 정산 요청 데이터 (dummySettlements)
+        // 이 배열을 수정하여 판매자 정산 요청 목록을 관리할 수 있습니다.
+        const dummySettlements = [
+            { id: 1, seller: "김철수", amount: "50,000원", requestDate: "2023-07-22 10:00", status: "미처리" },
+            { id: 2, seller: "이영희", amount: "30,000원", requestDate: "2023-07-23 11:00", status: "미처리" },
+            { id: 3, seller: "박지성", amount: "70,000원", requestDate: "2023-07-24 12:00", status: "완료" },
+        ];
+
+        // 리뷰·댓글 데이터 (dummyReviewsComments)
+        // 이 배열을 수정하여 리뷰 및 댓글 목록을 관리할 수 있습니다.
+        const dummyReviewsComments = [
+            { id: 1, author: "김철수", promptTitle: "마케팅 전략을 위한 프롬프트", rating: 5, content: "정말 유용하고 상세한 내용입니다!", date: "2023-07-22 10:00" },
+            { id: 2, author: "이영희", promptTitle: "새로운 AI 프롬프트 아이디어", rating: 4, content: "아이디어가 신선하네요. 몇 가지 개선점이 보입니다.", date: "2023-07-22 11:00" },
+            { id: 3, author: "박지성", promptTitle: "개발자를 위한 코드 생성 프롬프트", rating: 3, content: "기대했던 것보다는 부족하지만, 참고할 만합니다.", date: "2023-07-23 12:00" },
+            { id: 4, author: "최유리", promptTitle: "교육 콘텐츠 제작 프롬프트", rating: 5, content: "초보자도 쉽게 이해할 수 있도록 잘 설명되어 있어요.", date: "2023-07-23 13:00" },
+        ];
+
+        // 관리자 계정 데이터 (dummyAdminAccounts)
+        // 이 배열을 수정하여 관리자 계정 목록을 관리할 수 있습니다.
+        const dummyAdminAccounts = [
+            { id: 1, name: "관리자1", email: "admin1@example.com", role: "슈퍼어드민", status: "활성" },
+            { id: 2, name: "관리자2", email: "admin2@example.com", role: "콘텐츠모더레이터", status: "활성" },
+            { id: 3, name: "관리자3", email: "admin3@example.com", role: "고객지원", status: "비활성" },
+        ];
+
+        // 액션 로그 데이터 (dummyActionLogs)
+        // 이 배열을 수정하여 액션 로그 목록을 관리할 수 있습니다.
+        const dummyActionLogs = [
+            { id: 1, eventType: "게시물 승인", user: "관리자1", target: "프롬프트: 새로운 AI 프롬프트 아이디어", date: "2023-07-25 10:00" },
+            { id: 2, eventType: "회원 정보 수정", user: "관리자2", target: "회원: 이영희", date: "2023-07-25 10:30" },
+            { id: 3, eventType: "태그 추가", user: "관리자1", target: "태그: 데이터 분석", date: "2023-07-25 11:00" },
+        ];
+
+        // 공지사항 발송 이력 데이터 (dummyAnnouncementHistory)
+        // 이 배열을 수정하여 공지사항 발송 이력 목록을 관리할 수 있습니다.
+        const dummyAnnouncementHistory = [
+            { id: 1, title: "시스템 점검 안내", date: "2023-07-20 09:00" },
+            { id: 2, title: "새로운 기능 업데이트", date: "2023-07-15 14:00" },
+        ];
+
+        // 고객지원 티켓 데이터 (dummyTickets)
+        // 이 배열을 수정하여 고객지원 티켓 목록을 관리할 수 있습니다.
+        const dummyTickets = [
+            { id: "TKT001", author: "김철수", type: "결제 오류", status: "미처리", date: "2023-07-24 15:00" },
+            { id: "TKT002", author: "이영희", type: "프롬프트 문의", status: "진행중", date: "2023-07-23 10:00" },
+            { id: "TKT003", author: "박지성", type: "계정 문제", status: "완료", date: "2023-07-22 11:00" },
+        ];
+
+        // Pagination and Search Logic (Simplified for demonstration)
+        const itemsPerPage = 5;
+
+        function renderTable(data, tableBodyId, currentPage, searchInputId, type, extraParams = {}) {
+            const tableBody = document.getElementById(tableBodyId);
+            tableBody.innerHTML = '';
+
+            const searchTerm = searchInputId ? document.getElementById(searchInputId).value.toLowerCase() : '';
+            const filteredData = data.filter(item => {
+                if (type === 'user') {
+                    return item.name.toLowerCase().includes(searchTerm) || item.email.toLowerCase().includes(searchTerm);
+                } else if (type === 'post') {
+                    return item.title.toLowerCase().includes(searchTerm) || item.author.toLowerCase().includes(searchTerm);
+                } else if (type === 'tagCategory') {
+                    return item.name.toLowerCase().includes(searchTerm);
+                } else if (type === 'payment') {
+                    return item.buyer.toLowerCase().includes(searchTerm) || item.promptTitle.toLowerCase().includes(searchTerm);
+                } else if (type === 'reviewComment') {
+                    return item.author.toLowerCase().includes(searchTerm) || item.content.toLowerCase().includes(searchTerm);
+                } else if (type === 'adminAccount') {
+                    return item.name.toLowerCase().includes(searchTerm) || item.email.toLowerCase().includes(searchTerm);
+                } else if (type === 'actionLog') {
+                    return item.eventType.toLowerCase().includes(searchTerm) || item.user.toLowerCase().includes(searchTerm) || item.target.toLowerCase().includes(searchTerm);
+                } else if (type === 'ticket') {
+                    return item.id.toLowerCase().includes(searchTerm) || item.author.toLowerCase().includes(searchTerm) || item.type.toLowerCase().includes(searchTerm);
+                }
+                return true;
+            });
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedData = filteredData.slice(start, end);
+
+            paginatedData.forEach(item => {
+                const row = tableBody.insertRow();
+                if (type === 'user') {
+                    row.insertCell().textContent = item.id;
+                    row.insertCell().textContent = item.name;
+                    row.insertCell().textContent = item.email;
+                    row.insertCell().textContent = item.phone;
+                    row.insertCell().textContent = item.marketingConsent;
+                } else if (type === 'post') {
+                    row.insertCell().textContent = item.author;
+                    row.insertCell().textContent = item.title;
+                    row.insertCell().textContent = item.content.substring(0, 50) + '...'; // Preview
+                    row.insertCell().textContent = item.price;
+                    row.insertCell().textContent = item.requestDate;
+                    const actionCell = row.insertCell();
+                    actionCell.innerHTML = `
+                        <button class="btn btn-success btn-sm approve-btn" data-id="${item.id}" data-title="${item.title}">승인</button>
+                        <button class="btn btn-danger btn-sm reject-btn" data-id="${item.id}" data-title="${item.title}">거절</button>
+                    `;
+                } else if (type === 'tagCategory') {
+                    row.insertCell().textContent = item.id;
+                    row.insertCell().textContent = item.name;
+                    row.insertCell().textContent = item.type;
+                    row.insertCell().textContent = item.createdAt;
+                    row.insertCell().textContent = item.usageCount;
+                    const actionCell = row.insertCell();
+                    actionCell.innerHTML = `
+                        <button class="btn btn-info btn-sm edit-btn" data-id="${item.id}" data-name="${item.name}">수정</button>
+                        <button class="btn btn-danger btn-sm delete-btn" data-id="${item.id}" data-name="${item.name}">삭제</button>
+                    `;
+                } else if (type === 'payment') {
+                    row.insertCell().textContent = item.id;
+                    row.insertCell().textContent = item.buyer;
+                    row.insertCell().textContent = item.promptTitle;
+                    row.insertCell().textContent = item.amount;
+                    row.insertCell().textContent = item.status;
+                    row.insertCell().textContent = item.date;
+                    const actionCell = row.insertCell();
+                    if (item.status === '환불') {
+                        actionCell.innerHTML = `
+                            <button class="btn btn-success btn-sm refund-approve-btn" data-id="${item.id}">환불 승인</button>
+                            <button class="btn btn-danger btn-sm refund-reject-btn" data-id="${item.id}">환불 거절</button>
+                        `;
+                    } else {
+                        actionCell.textContent = '-';
+                    }
+                } else if (type === 'settlement') {
+                    row.insertCell().textContent = item.id;
+                    row.insertCell().textContent = item.seller;
+                    row.insertCell().textContent = item.amount;
+                    row.insertCell().textContent = item.requestDate;
+                    row.insertCell().textContent = item.status;
+                    const actionCell = row.insertCell();
+                    if (item.status === '미처리') {
+                        actionCell.innerHTML = `
+                            <button class="btn btn-success btn-sm settlement-complete-btn" data-id="${item.id}">정산 완료</button>
+                        `;
+                    } else {
+                        actionCell.textContent = '-';
+                    }
+                } else if (type === 'reviewComment') {
+                    row.insertCell().textContent = item.id;
+                    row.insertCell().textContent = item.author;
+                    row.insertCell().textContent = item.promptTitle;
+                    row.insertCell().textContent = item.rating;
+                    row.insertCell().textContent = item.content.substring(0, 50) + '...';
+                    row.insertCell().textContent = item.date;
+                    const actionCell = row.insertCell();
+                    actionCell.innerHTML = `
+                        <button class="btn btn-danger btn-sm delete-review-btn" data-id="${item.id}">삭제</button>
+                        <button class="btn btn-warning btn-sm toggle-spam-btn" data-id="${item.id}">${item.isSpam ? '스팸 해제' : '스팸 표시'}</button>
+                    `;
+                } else if (type === 'adminAccount') {
+                    row.insertCell().textContent = item.id;
+                    row.insertCell().textContent = item.name;
+                    row.insertCell().textContent = item.email;
+                    const roleCell = row.insertCell();
+                    roleCell.innerHTML = `
+                        <select class="form-select form-select-sm role-select" data-id="${item.id}">
+                            <option value="슈퍼어드민" ${item.role === '슈퍼어드민' ? 'selected' : ''}>슈퍼어드민</option>
+                            <option value="콘텐츠모더레이터" ${item.role === '콘텐츠모더레이터' ? 'selected' : ''}>콘텐츠모더레이터</option>
+                            <option value="고객지원" ${item.role === '고객지원' ? 'selected' : ''}>고객지원</option>
+                        </select>
+                    `;
+                    const statusCell = row.insertCell();
+                    statusCell.innerHTML = `
+                        <div class="form-check form-switch">
+                            <input class="form-check-input status-toggle" type="checkbox" role="switch" id="statusToggle${item.id}" data-id="${item.id}" ${item.status === '활성' ? 'checked' : ''}>
+                            <label class="form-check-label" for="statusToggle${item.id}">${item.status}</label>
+                        </div>
+                    `;
+                    const actionCell = row.insertCell();
+                    actionCell.innerHTML = `
+                        <button class="btn btn-danger btn-sm delete-admin-btn" data-id="${item.id}">삭제</button>
+                    `;
+                } else if (type === 'actionLog') {
+                    row.insertCell().textContent = item.id;
+                    row.insertCell().textContent = item.eventType;
+                    row.insertCell().textContent = item.user;
+                    row.insertCell().textContent = item.target;
+                    row.insertCell().textContent = item.date;
+                } else if (type === 'announcementHistory') {
+                    row.insertCell().textContent = item.id;
+                    row.insertCell().textContent = item.title;
+                    row.insertCell().textContent = item.date;
+                } else if (type === 'ticket') {
+                    row.insertCell().textContent = item.id;
+                    row.insertCell().textContent = item.author;
+                    row.insertCell().textContent = item.type;
+                    const statusCell = row.insertCell();
+                    statusCell.innerHTML = `
+                        <select class="form-select form-select-sm ticket-status-select" data-id="${item.id}">
+                            <option value="미처리" ${item.status === '미처리' ? 'selected' : ''}>미처리</option>
+                            <option value="진행중" ${item.status === '진행중' ? 'selected' : ''}>진행중</option>
+                            <option value="완료" ${item.status === '완료' ? 'selected' : ''}>완료</option>
+                        </select>
+                    `;
+                    row.insertCell().textContent = item.date;
+                    const actionCell = row.insertCell();
+                    actionCell.innerHTML = `
+                        <button class="btn btn-info btn-sm reply-ticket-btn" data-id="${item.id}" data-author="${item.author}">답변</button>
+                    `;
+                }
+            });
+
+            // Add event listeners for specific buttons
+            if (type === 'post') {
+                tableBody.querySelectorAll('.approve-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const id = event.target.dataset.id;
+                        const title = event.target.dataset.title;
+                        console.log(`게시물 승인: ID ${id}, 제목: "${title}"`);
+                        alert(`게시물 승인: ID ${id}, 제목: "${title}"`);
+                    });
+                });
+                tableBody.querySelectorAll('.reject-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const id = event.target.dataset.id;
+                        const title = event.target.dataset.title;
+                        console.log(`게시물 거절: ID ${id}, 제목: "${title}"`);
+                        alert(`게시물 거절: ID ${id}, 제목: "${title}"`);
+                    });
+                });
+            } else if (type === 'tagCategory') {
+                tableBody.querySelectorAll('.edit-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const id = event.target.dataset.id;
+                        const name = event.target.dataset.name;
+                        console.log(`태그/카테고리 수정: ID ${id}, 이름: "${name}"`);
+                        alert(`태그/카테고리 수정: ID ${id}, 이름: "${name}"`);
+                    });
+                });
+                tableBody.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const id = event.target.dataset.id;
+                        const name = event.target.dataset.name;
+                        console.log(`태그/카테고리 삭제: ID ${id}, 이름: "${name}"`);
+                        alert(`태그/카테고리 삭제: ID ${id}, 이름: "${name}"`);
+                    });
+                });
+            } else if (type === 'payment') {
+                tableBody.querySelectorAll('.refund-approve-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const id = event.target.dataset.id;
+                        console.log(`환불 승인: 결제 ID ${id}`);
+                        alert(`환불 승인: 결제 ID ${id}`);
+                    });
+                });
+                tableBody.querySelectorAll('.refund-reject-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const id = event.target.dataset.id;
+                        console.log(`환불 거절: 결제 ID ${id}`);
+                        alert(`환불 거절: 결제 ID ${id}`);
+                    });
+                });
+            } else if (type === 'settlement') {
+                tableBody.querySelectorAll('.settlement-complete-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const id = event.target.dataset.id;
+                        console.log(`정산 완료 처리: 정산 ID ${id}`);
+                        alert(`정산 완료 처리: 정산 ID ${id}`);
+                    });
+                });
+            } else if (type === 'reviewComment') {
+                tableBody.querySelectorAll('.delete-review-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const id = event.target.dataset.id;
+                        console.log(`리뷰/댓글 삭제: ID ${id}`);
+                        alert(`리뷰/댓글 삭제: ID ${id}`);
+                    });
+                });
+                tableBody.querySelectorAll('.toggle-spam-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const id = event.target.dataset.id;
+                        console.log(`리뷰/댓글 스팸 토글: ID ${id}`);
+                        alert(`리뷰/댓글 스팸 토글: ID ${id}`);
+                    });
+                });
+            } else if (type === 'adminAccount') {
+                tableBody.querySelectorAll('.role-select').forEach(select => {
+                    select.addEventListener('change', (event) => {
+                        const id = event.target.dataset.id;
+                        const newRole = event.target.value;
+                        console.log(`관리자 계정 역할 변경: ID ${id}, 새 역할: ${newRole}`);
+                        alert(`관리자 계정 역할 변경: ID ${id}, 새 역할: ${newRole}`);
+                    });
+                });
+                tableBody.querySelectorAll('.status-toggle').forEach(toggle => {
+                    toggle.addEventListener('change', (event) => {
+                        const id = event.target.dataset.id;
+                        const newStatus = event.target.checked ? '활성' : '비활성';
+                        console.log(`관리자 계정 상태 토글: ID ${id}, 새 상태: ${newStatus}`);
+                        alert(`관리자 계정 상태 토글: ID ${id}, 새 상태: ${newStatus}`);
+                    });
+                });
+                tableBody.querySelectorAll('.delete-admin-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const id = event.target.dataset.id;
+                        console.log(`관리자 계정 삭제: ID ${id}`);
+                        alert(`관리자 계정 삭제: ID ${id}`);
+                    });
+                });
+            } else if (type === 'ticket') {
+                tableBody.querySelectorAll('.ticket-status-select').forEach(select => {
+                    select.addEventListener('change', (event) => {
+                        const id = event.target.dataset.id;
+                        const newStatus = event.target.value;
+                        console.log(`티켓 상태 변경: ID ${id}, 새 상태: ${newStatus}`);
+                        alert(`티켓 상태 변경: ID ${id}, 새 상태: ${newStatus}`);
+                    });
+                });
+                tableBody.querySelectorAll('.reply-ticket-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const id = event.target.dataset.id;
+                        const author = event.target.dataset.author;
+                        console.log(`티켓 답변 모달 열기: ID ${id}, 작성자: ${author}`);
+                        alert(`티켓 답변 모달 열기: ID ${id}, 작성자: ${author}`);
+                    });
+                });
+            }
+        }
+
+        function renderPagination(data, paginationId, currentPage, searchInputId, type) {
+            const paginationUl = document.getElementById(paginationId);
+            paginationUl.innerHTML = '';
+
+            const searchTerm = searchInputId ? document.getElementById(searchInputId).value.toLowerCase() : '';
+            const filteredData = data.filter(item => {
+                if (type === 'user') {
+                    return item.name.toLowerCase().includes(searchTerm) || item.email.toLowerCase().includes(searchTerm);
+                } else if (type === 'post') {
+                    return item.title.toLowerCase().includes(searchTerm) || item.author.toLowerCase().includes(searchTerm);
+                } else if (type === 'tagCategory') {
+                    return item.name.toLowerCase().includes(searchTerm);
+                } else if (type === 'payment') {
+                    return item.buyer.toLowerCase().includes(searchTerm) || item.promptTitle.toLowerCase().includes(searchTerm);
+                } else if (type === 'reviewComment') {
+                    return item.author.toLowerCase().includes(searchTerm) || item.content.toLowerCase().includes(searchTerm);
+                } else if (type === 'adminAccount') {
+                    return item.name.toLowerCase().includes(searchTerm) || item.email.toLowerCase().includes(searchTerm);
+                } else if (type === 'actionLog') {
+                    return item.eventType.toLowerCase().includes(searchTerm) || item.user.toLowerCase().includes(searchTerm) || item.target.toLowerCase().includes(searchTerm);
+                } else if (type === 'ticket') {
+                    return item.id.toLowerCase().includes(searchTerm) || item.author.toLowerCase().includes(searchTerm) || item.type.toLowerCase().includes(searchTerm);
+                }
+                return true;
+            });
+
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const li = document.createElement('li');
+                li.classList.add('page-item');
+                if (i === currentPage) {
+                    li.classList.add('active');
+                }
+                const a = document.createElement('a');
+                a.classList.add('page-link');
+                a.href = '#';
+                a.textContent = i;
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (type === 'user') {
+                        renderUserTable(i);
+                    } else if (type === 'post') {
+                        renderPostTable(i);
+                    } else if (type === 'tagCategory') {
+                        renderTagCategoryTable(i);
+                    } else if (type === 'payment') {
+                        renderPaymentTable(i);
+                    } else if (type === 'settlement') {
+                        renderSettlementTable(i);
+                    } else if (type === 'reviewComment') {
+                        renderReviewCommentTable(i);
+                    } else if (type === 'adminAccount') {
+                        renderAdminAccountTable(i);
+                    } else if (type === 'actionLog') {
+                        renderActionLogTable(i);
+                    } else if (type === 'announcementHistory') {
+                        renderAnnouncementHistoryTable(i);
+                    } else if (type === 'ticket') {
+                        renderTicketTable(i);
+                    }
+                });
+                li.appendChild(a);
+                paginationUl.appendChild(li);
+            }
+        }
+
+        let currentUserPage = 1;
+        let currentPostPage = 1;
+        let currentTagCategoryPage = 1;
+        let currentPaymentPage = 1;
+        let currentSettlementPage = 1;
+        let currentReviewCommentPage = 1;
+        let currentAdminAccountPage = 1;
+        let currentActionLogPage = 1;
+        let currentAnnouncementHistoryPage = 1;
+        let currentTicketPage = 1;
+
+        function renderUserTable(page = 1) {
+            currentUserPage = page;
+            renderTable(dummyUsers, 'userTableBody', currentUserPage, 'userSearchInput', 'user');
+            renderPagination(dummyUsers, 'userPagination', currentUserPage, 'userSearchInput', 'user');
+        }
+
+        function renderPostTable(page = 1) {
+            currentPostPage = page;
+            renderTable(dummyPosts, 'postTableBody', currentPostPage, 'postSearchInput', 'post');
+            renderPagination(dummyPosts, 'postPagination', currentPostPage, 'postSearchInput', 'post');
+        }
+
+        function renderTagCategoryTable(page = 1) {
+            currentTagCategoryPage = page;
+            renderTable(dummyTagsCategories, 'tagCategoryTableBody', currentTagCategoryPage, 'tagCategorySearchInput', 'tagCategory');
+            renderPagination(dummyTagsCategories, 'tagCategoryPagination', currentTagCategoryPage, 'tagCategorySearchInput', 'tagCategory');
+        }
+
+        function renderPaymentTable(page = 1) {
+            currentPaymentPage = page;
+            renderTable(dummyPayments, 'paymentTableBody', currentPaymentPage, null, 'payment'); // No search input for payments
+            renderPagination(dummyPayments, 'paymentPagination', currentPaymentPage, null, 'payment');
+        }
+
+        function renderSettlementTable(page = 1) {
+            currentSettlementPage = page;
+            renderTable(dummySettlements, 'settlementTableBody', currentSettlementPage, null, 'settlement'); // No search input for settlements
+            renderPagination(dummySettlements, 'settlementPagination', currentSettlementPage, null, 'settlement');
+        }
+
+        function renderReviewCommentTable(page = 1) {
+            currentReviewCommentPage = page;
+            renderTable(dummyReviewsComments, 'reviewCommentTableBody', currentReviewCommentPage, 'reviewCommentSearchInput', 'reviewComment');
+            renderPagination(dummyReviewsComments, 'reviewCommentPagination', currentReviewCommentPage, 'reviewCommentSearchInput', 'reviewComment');
+        }
+
+        function renderAdminAccountTable(page = 1) {
+            currentAdminAccountPage = page;
+            renderTable(dummyAdminAccounts, 'adminAccountTableBody', currentAdminAccountPage, null, 'adminAccount');
+            renderPagination(dummyAdminAccounts, 'adminAccountPagination', currentAdminAccountPage, null, 'adminAccount');
+        }
+
+        function renderActionLogTable(page = 1) {
+            currentActionLogPage = page;
+            renderTable(dummyActionLogs, 'actionLogTableBody', currentActionLogPage, null, 'actionLog');
+            renderPagination(dummyActionLogs, 'actionLogPagination', currentActionLogPage, null, 'actionLog');
+        }
+
+        function renderAnnouncementHistoryTable(page = 1) {
+            currentAnnouncementHistoryPage = page;
+            renderTable(dummyAnnouncementHistory, 'announcementHistoryTableBody', currentAnnouncementHistoryPage, null, 'announcementHistory');
+            renderPagination(dummyAnnouncementHistory, 'announcementHistoryPagination', currentAnnouncementHistoryPage, null, 'announcementHistory');
+        }
+
+        function renderTicketTable(page = 1) {
+            currentTicketPage = page;
+            renderTable(dummyTickets, 'ticketTableBody', currentTicketPage, 'ticketSearchInput', 'ticket');
+            renderPagination(dummyTickets, 'ticketPagination', currentTicketPage, 'ticketSearchInput', 'ticket');
+        }
+
+        // Chart.js for Statistics
+        // 통계 차트 렌더링 함수
+        // 이 함수는 DAU/MAU 차트와 일별 매출 그래프를 그립니다.
+        // 차트 데이터는 더미 데이터이며, 실제 데이터로 교체해야 합니다.
+        function renderCharts() {
+            const dauMauCtx = document.getElementById('dauMauChart').getContext('2d');
+            new Chart(dauMauCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1일전', '2일전', '3일전', '4일전', '5일전', '6일전', '오늘'],
+                    datasets: [
+                        { label: 'DAU', data: [100, 120, 110, 130, 150, 140, 160], borderColor: 'rgb(75, 192, 192)', tension: 0.1 },
+                        { label: 'MAU', data: [1000, 1050, 1030, 1080, 1100, 1090, 1120], borderColor: 'rgb(255, 99, 132)', tension: 0.1 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            new Chart(salesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['1일전', '2일전', '3일전', '4일전', '5일전', '6일전', '오늘'],
+                    datasets: [
+                        { label: '일별 매출', data: [50000, 60000, 55000, 70000, 80000, 75000, 90000], backgroundColor: 'rgba(54, 162, 235, 0.5)' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        // 인기 프롬프트 테이블 렌더링 함수
+        // 이 함수는 인기 프롬프트 상위 N개 리스트를 테이블에 표시합니다.
+        // 데이터는 더미 데이터이며, 실제 데이터로 교체해야 합니다.
+        function renderTopPromptsTable() {
+            const topPrompts = [
+                { rank: 1, title: "개발자를 위한 코드 생성 프롬프트", sales: 50, totalRevenue: "1,000,000팟" },
+                { rank: 2, title: "마케팅 전략을 위한 프롬프트", sales: 45, totalRevenue: "675,000팟" },
+                { rank: 3, title: "새로운 AI 프롬프트 아이디어", sales: 40, totalRevenue: "400,000팟" },
+                { rank: 4, title: "금융 분석 보고서 작성 프롬프트", sales: 30, totalRevenue: "750,000팟" },
+                { rank: 5, title: "여행 계획 추천 프롬프트", sales: 25, totalRevenue: "300,000팟" },
+            ];
+            const tableBody = document.getElementById('topPromptsTableBody');
+            tableBody.innerHTML = '';
+            topPrompts.forEach(item => {
+                const row = tableBody.insertRow();
+                row.insertCell().textContent = item.rank;
+                row.insertCell().textContent = item.title;
+                row.insertCell().textContent = item.sales;
+                row.insertCell().textContent = item.totalRevenue;
+            });
+        }
+
+        // Initial render and event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1) 초기엔 모든 섹션 숨기고, '회원 관리'만 보이게
+            document.querySelectorAll('section.card').forEach(sec => sec.classList.add('d-none'));
+            document.getElementById('userManagement').classList.remove('d-none');
+
+            // 2) 사이드바 네비게이션 클릭 시
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.addEventListener('click', e => {
+                    e.preventDefault();
+                    // (1) active 토글
+                    document.querySelectorAll('.sidebar .nav-link').forEach(n => n.classList.remove('active'));
+                    link.classList.add('active');
+
+                    // (2) 전체 섹션 숨기고, 클릭한 버튼의 href로 표시
+                    document.querySelectorAll('section.card').forEach(sec => sec.classList.add('d-none'));
+                    const targetId = link.getAttribute('href');            // e.g. "#postManagement"
+                    document.querySelector(targetId).classList.remove('d-none');
+                });
+            });
+
+            // --- 기존 테이블 렌더링 / 차트 그리기 함수 호출은 그대로 유지 ---
+            renderUserTable();
+            renderPostTable();
+            renderTagCategoryTable();
+            renderPaymentTable();
+            renderSettlementTable();
+            renderReviewCommentTable();
+            renderAdminAccountTable();
+            renderActionLogTable();
+            renderAnnouncementHistoryTable();
+            renderTicketTable();
+            renderCharts();
+            renderTopPromptsTable();
+
+            // Search input event listeners
+            document.getElementById('userSearchInput').addEventListener('keyup', () => renderUserTable(1));
+            document.getElementById('postSearchInput').addEventListener('keyup', () => renderPostTable(1));
+            document.getElementById('tagCategorySearchInput').addEventListener('keyup', () => renderTagCategoryTable(1));
+            document.getElementById('reviewCommentSearchInput').addEventListener('keyup', () => renderReviewCommentTable(1));
+            document.getElementById('ticketSearchInput').addEventListener('keyup', () => renderTicketTable(1));
+
+            // Tag/Category Add Button
+            document.getElementById('addTagCategoryBtn').addEventListener('click', () => {
+                console.log('새 태그/카테고리 추가 버튼 클릭');
+                alert('새 태그/카테고리 추가 모달/폼 열기');
+            });
+
+            // System Settings Save Buttons
+            document.getElementById('saveLegalTextsBtn').addEventListener('click', () => {
+                const terms = document.getElementById('termsOfServiceEditor').value;
+                const privacy = document.getElementById('privacyPolicyEditor').value;
+                console.log('이용약관 및 개인정보처리방침 저장:', { terms, privacy });
+                alert('이용약관 및 개인정보처리방침 저장 완료');
+            });
+            document.getElementById('saveEmailTemplateBtn').addEventListener('click', () => {
+                const subject = document.getElementById('emailTemplateSubject').value;
+                const body = document.getElementById('emailTemplateBody').value;
+                console.log('이메일 템플릿 저장:', { subject, body });
+                alert('이메일 템플릿 저장 완료');
+            });
+            document.getElementById('saveCommissionRateBtn').addEventListener('click', () => {
+                const rate = document.getElementById('commissionRate').value;
+                console.log('플랫폼 수수료율 저장:', rate + '%');
+                alert('플랫폼 수수료율 저장 완료');
+            });
+
+            // Announcement Send Button
+            document.getElementById('sendAnnouncementBtn').addEventListener('click', () => {
+                const title = document.getElementById('announcementTitle').value;
+                const body = document.getElementById('announcementBody').value;
+                console.log('공지사항 발송:', { title, body });
+                alert('공지사항 발송 완료');
+                // Optionally, clear form and re-render history
+                document.getElementById('announcementTitle').value = '';
+                document.getElementById('announcementBody').value = '';
+                // dummyAnnouncementHistory.unshift({ id: dummyAnnouncementHistory.length + 1, title: title, date: new Date().toLocaleString() });
+                // renderAnnouncementHistoryTable(1);
+            });
+        });
+    </script>
+</body>
+</html>
